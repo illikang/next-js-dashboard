@@ -61,7 +61,8 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
-
+    // Promise.all会同步执行这几个SQL查询语句。但问题是，我们依然需要等待所有的查询完成后，才能继续执行后续的代码。
+    // 这是因为Promise.all会等待所有的Promise对象都被resolve后，才会返回一个包含所有结果的数组。
     const data = await Promise.all([
       invoiceCountPromise,
       customerCountPromise,
