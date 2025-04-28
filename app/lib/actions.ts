@@ -28,10 +28,15 @@ export async function createInvoice(formData: FormData) {
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split("T")[0];
 
-  await sql`
+  try {
+    await sql`
     INSERT INTO invoices (customer_id, amount, status, date) 
     VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
     `;
+  } catch (error) {
+    console.error("Database Error:", error);
+  }
+
   //清楚路径“/dashboard/invices”的缓存数据，确保下次访问时获取最新的数据。
   revalidatePath("/dashboard/invoices");
   //重定向到“/dashboard/invoices”路径
@@ -47,11 +52,15 @@ export async function updateInvoice(id: string, formData: FormData) {
 
   const amountInCents = amount * 100;
 
-  await sql`
-      UPDATE invoices
-      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-      WHERE id = ${id}
-    `;
+  try {
+    await sql`
+    UPDATE invoices
+    SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+    WHERE id = ${id}
+  `;
+  } catch (error) {
+    console.error("Database Error:", error);
+  }
 
   revalidatePath("/dashboard/invoices");
   redirect("/dashboard/invoices");
